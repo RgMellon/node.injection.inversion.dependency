@@ -10,33 +10,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlaceOrder = void 0;
-const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
-const client_sqs_1 = require("@aws-sdk/client-sqs");
-const lib_dynamodb_1 = require("@aws-sdk/lib-dynamodb");
 const Order_1 = require("../entity/Order");
+const DynamoDbRepository_1 = require("../repository/DynamoDbRepository");
+const SQSGateway_1 = require("../gateways/SQSGateway");
+const SESGateway_1 = require("../gateways/SESGateway");
 class PlaceOrder {
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
             const customerEmail = "rgmelo94@gmail.com";
             const amount = Math.ceil(Math.random() * 1000);
             const order = new Order_1.Order(customerEmail, amount);
-            const ddbClient = lib_dynamodb_1.DynamoDBDocumentClient.from(new client_dynamodb_1.DynamoDBClient({
-                region: "us-east-1",
-            }));
-            const putItemCommand = new lib_dynamodb_1.PutCommand({
-                TableName: "Orders",
-                Item: order,
-            });
-            yield ddbClient.send(putItemCommand);
-            const sqsClient = new client_sqs_1.SQSClient({ region: "us-east-1" });
-            const sendMessageCommand = new client_sqs_1.SendMessageCommand({
-                QueueUrl: "https://sqs.us-east-1.amazonaws.com/445720700848/ProcessPaymentQueue",
-                MessageBody: JSON.stringify({ orderId: order.id }),
-            });
-            yield sqsClient.send(sendMessageCommand);
-            console.log({
-                sendEmailTo: customerEmail,
-            });
+            const dynamoRepository = new DynamoDbRepository_1.DynamoDBRepository();
+            const sqsGateway = new SQSGateway_1.SQSGateway();
+            const sesGateway = new SESGateway_1.SESGateway();
+            yield dynamoRepository.create(order);
+            yield sqsGateway.sendMessage({ orderId: order.id });
+            sesGateway.sendEmail(customerEmail);
             return {
                 orderId: order.id,
             };
