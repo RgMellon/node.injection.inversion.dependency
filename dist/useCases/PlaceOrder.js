@@ -12,19 +12,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlaceOrder = void 0;
 const Order_1 = require("../entity/Order");
 class PlaceOrder {
-    constructor(dynamoRepository, sqsGateway, sesGateway) {
-        this.dynamoRepository = dynamoRepository;
-        this.sqsGateway = sqsGateway;
-        this.sesGateway = sesGateway;
+    constructor(orderRepository, queuGateway, emailGateway) {
+        this.orderRepository = orderRepository;
+        this.queuGateway = queuGateway;
+        this.emailGateway = emailGateway;
     }
     execute() {
         return __awaiter(this, void 0, void 0, function* () {
             const customerEmail = "rgmelo94@gmail.com";
             const amount = Math.ceil(Math.random() * 1000);
             const order = new Order_1.Order(customerEmail, amount);
-            yield this.dynamoRepository.create(order);
-            yield this.sqsGateway.sendMessage({ orderId: order.id });
-            this.sesGateway.sendEmail(customerEmail);
+            yield this.orderRepository.create(order);
+            yield this.queuGateway.sendMessage({ orderId: order.id });
+            this.emailGateway.sendEmail(customerEmail);
             return {
                 orderId: order.id,
             };
