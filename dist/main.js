@@ -13,16 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
-const PlaceOrder_1 = require("./useCases/PlaceOrder");
-const makeDynamoRepository_1 = require("./factories/makeDynamoRepository");
-const makeSqsGateway_1 = require("./factories/makeSqsGateway");
-const makeSesGateway_1 = require("./factories/makeSesGateway");
+const makePlaceOrder_1 = require("./factories/makePlaceOrder");
 const app = (0, fastify_1.default)();
 app.post("/checkout", (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    const dynamoRepository = (0, makeDynamoRepository_1.makeDynamoRepository)();
-    const sqsGateway = (0, makeSqsGateway_1.makeSqsGateway)();
-    const sesGateway = (0, makeSesGateway_1.makeSesGateway)();
-    const placeOrder = new PlaceOrder_1.PlaceOrder(dynamoRepository, sqsGateway, sesGateway);
+    const placeOrder = (0, makePlaceOrder_1.makePlaceOrder)();
     const { orderId } = yield placeOrder.execute();
     reply.status(201).send({ orderId });
 }));
