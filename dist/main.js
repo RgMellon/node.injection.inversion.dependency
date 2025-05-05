@@ -14,14 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
 const PlaceOrder_1 = require("./useCases/PlaceOrder");
-const DynamoDbRepository_1 = require("./repository/DynamoDbRepository");
-const SQSGateway_1 = require("./gateways/SQSGateway");
-const SESGateway_1 = require("./gateways/SESGateway");
+const makeDynamoRepository_1 = require("./factories/makeDynamoRepository");
+const makeSqsGateway_1 = require("./factories/makeSqsGateway");
+const makeSesGateway_1 = require("./factories/makeSesGateway");
 const app = (0, fastify_1.default)();
 app.post("/checkout", (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    const dynamoRepository = new DynamoDbRepository_1.DynamoDBRepository();
-    const sqsGateway = new SQSGateway_1.SQSGateway();
-    const sesGateway = new SESGateway_1.SESGateway();
+    const dynamoRepository = (0, makeDynamoRepository_1.makeDynamoRepository)();
+    const sqsGateway = (0, makeSqsGateway_1.makeSqsGateway)();
+    const sesGateway = (0, makeSesGateway_1.makeSesGateway)();
     const placeOrder = new PlaceOrder_1.PlaceOrder(dynamoRepository, sqsGateway, sesGateway);
     const { orderId } = yield placeOrder.execute();
     reply.status(201).send({ orderId });
