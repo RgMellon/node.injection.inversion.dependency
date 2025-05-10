@@ -1,9 +1,18 @@
-import { SQSClient } from "@aws-sdk/client-sqs";
-import { PlaceOrder } from "../useCases/PlaceOrder";
-
 type Constructor<T> = new (...args: any[]) => T;
+
 export class Registry {
     private readonly services: Map<string, Constructor<any>> = new Map();
+    private static instance: Registry;
+
+    private constructor() {}
+
+    static getInstance() {
+        if (!this.instance) {
+            this.instance = new Registry();
+        }
+
+        return this.instance;
+    }
 
     register<T>(implementation: Constructor<T>) {
         const token = implementation.name;
@@ -14,7 +23,14 @@ export class Registry {
 
         this.services.set(token, implementation);
     }
-}
 
-const r = new Registry();
-r.register(PlaceOrder);
+    resolve<T>(implementation: Constructor<T>): T {
+        const token = implementation.name;
+
+        const impl = this.services.get(token);
+
+        if (!impl) throw new Error(`${token} was not found`);
+
+        return new impl();
+    }
+}
