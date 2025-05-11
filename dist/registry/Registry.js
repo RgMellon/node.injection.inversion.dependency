@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Registry = void 0;
-const PlaceOrder_1 = require("../useCases/PlaceOrder");
 class Registry {
     constructor() {
         this.services = new Map();
+    }
+    static getInstance() {
+        if (!this.instance) {
+            this.instance = new Registry();
+        }
+        return this.instance;
     }
     register(implementation) {
         const token = implementation.name;
@@ -13,7 +18,15 @@ class Registry {
         }
         this.services.set(token, implementation);
     }
+    resolve(implementation) {
+        var _a;
+        const token = implementation.name;
+        const impl = this.services.get(token);
+        if (!impl)
+            throw new Error(`${token} was not found`);
+        const paramTypes = (_a = Reflect.getMetadata("design:paramtypes", impl)) !== null && _a !== void 0 ? _a : [];
+        const dependencies = paramTypes.map((constructor) => this.resolve(constructor));
+        return new impl(...dependencies);
+    }
 }
 exports.Registry = Registry;
-const r = new Registry();
-r.register(PlaceOrder_1.PlaceOrder);

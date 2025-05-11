@@ -12,11 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const fastify_1 = __importDefault(require("fastify"));
-const makePlaceOrder_1 = require("./factories/makePlaceOrder");
+const PlaceOrder_1 = require("./useCases/PlaceOrder");
+// import { DynamoDBRepository } from "./repository/DynamoDbRepository";
+// import { SQSGateway } from "./gateways/SQSGateway";
+// import { SESGateway } from "./gateways/SESGateway";
+const Registry_1 = require("./registry/Registry");
 const app = (0, fastify_1.default)();
 app.post("/checkout", (request, reply) => __awaiter(void 0, void 0, void 0, function* () {
-    const placeOrder = (0, makePlaceOrder_1.makePlaceOrder)();
+    // const container = Registry.getInstance();
+    const placeOrder = Registry_1.Registry.getInstance().resolve(PlaceOrder_1.PlaceOrder);
     const { orderId } = yield placeOrder.execute();
     reply.status(201).send({ orderId });
 }));

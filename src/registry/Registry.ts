@@ -31,6 +31,13 @@ export class Registry {
 
         if (!impl) throw new Error(`${token} was not found`);
 
-        return new impl();
+        const paramTypes: Constructor<any>[] =
+            Reflect.getMetadata("design:paramtypes", impl) ?? [];
+
+        const dependencies = paramTypes.map((constructor) =>
+            this.resolve(constructor)
+        );
+
+        return new impl(...dependencies);
     }
 }

@@ -1,9 +1,10 @@
+import { Injectable } from "../di/Injectable";
 import { Order } from "../entity/Order";
-import { SESGateway } from "../gateways/SESGateway";
 import { IOrderRepository } from "../interfaces/entities/IOrderRepository";
 import { IEmailGateway } from "../interfaces/gateways/IEmailGateway";
 import { IQueuGateway } from "../interfaces/gateways/IQueueGateway";
 
+@Injectable()
 export class PlaceOrder {
     constructor(
         private readonly orderRepository: IOrderRepository,
