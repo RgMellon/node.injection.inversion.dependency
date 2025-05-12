@@ -2,17 +2,11 @@ import "reflect-metadata";
 
 import fastify from "fastify";
 import { PlaceOrder } from "./useCases/PlaceOrder";
-// import { DynamoDBRepository } from "./repository/DynamoDbRepository";
-// import { SQSGateway } from "./gateways/SQSGateway";
-// import { SESGateway } from "./gateways/SESGateway";
-import { Registry } from "./registry/Registry";
-
+import { container } from "./di/container";
 const app = fastify();
 
 app.post("/checkout", async (request, reply) => {
-    // const container = Registry.getInstance();
-
-    const placeOrder = Registry.getInstance().resolve(PlaceOrder);
+    const placeOrder = container.resolve<PlaceOrder>("PlaceOrder");
 
     const { orderId } = await placeOrder.execute();
 

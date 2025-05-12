@@ -1,5 +1,10 @@
+import { deprecate } from "node:util";
+
 type Constructor<T> = new (...args: any[]) => T;
 
+/**
+ * Usado quando nao precisa de inversao de dependencia, e vc pode depender da classe concreta, caso contrario usar o novo
+ */
 export class Registry {
     private readonly services: Map<string, Constructor<any>> = new Map();
     private static instance: Registry;
